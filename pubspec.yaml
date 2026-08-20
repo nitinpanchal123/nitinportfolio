@@ -1,0 +1,46 @@
+name: nitin_portfolio
+description: Nitin Mistry — Flutter & Android developer portfolio
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.12.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/docs/
+    - assets/images/
+    - assets/images/play/fakecall/
+    - assets/images/play/smsforwarder/
+    - assets/images/play/autoreply/
+    - assets/images/play/rajputs/
+    - assets/images/play/click4bima/
+    - assets/images/play/bharatdarshan/
+    - assets/images/play/paygcustomer/
+    - assets/images/play/payg/
+    - assets/images/play/paygrms/
+  fonts:
+    - family: InstrumentSerif
+      fonts:
+        - asset: assets/fonts/InstrumentSerif-Regular.ttf
+        - asset: assets/fonts/InstrumentSerif-Italic.ttf
+          style: italic
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit-Regular.ttf
+        - asset: assets/fonts/Outfit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Outfit-SemiBold.ttf
+          weight: 600
