@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../data/portfolio.dart';
-import '../launch.dart';
-import '../theme/app_theme.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/utils/launcher_utils.dart';
+import '../../models/portfolio_models.dart';
 
 class ProjectScreen extends StatefulWidget {
   const ProjectScreen({super.key, required this.project});

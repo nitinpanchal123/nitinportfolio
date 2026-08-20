@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'screens/home_screen.dart';
-import 'theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/routing/router.dart';
+import 'core/theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +14,11 @@ void main() {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-  runApp(const NitinPortfolioApp());
+  runApp(
+    const ProviderScope(
+      child: NitinPortfolioApp(),
+    ),
+  );
 }
 
 class NitinPortfolioApp extends StatelessWidget {
@@ -22,11 +26,11 @@ class NitinPortfolioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Nitin Mistry — Flutter Developer',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
-      home: const HomeScreen(),
+      routerConfig: router,
     );
   }
 }

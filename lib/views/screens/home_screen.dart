@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../data/portfolio.dart';
-import '../launch.dart';
-import '../theme/app_theme.dart';
-import 'project_screen.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/utils/launcher_utils.dart';
+import '../../models/portfolio_models.dart';
+import '../../viewmodels/portfolio_viewmodel.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _work = GlobalKey();
   final _experience = GlobalKey();
   final _skills = GlobalKey();
@@ -33,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 900;
+    final profile = ref.watch(profileProvider);
 
     return Scaffold(
       body: CustomScrollView(
@@ -61,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Flexible(
+                Flexible(
                   child: Text(
-                    Profile.name,
+                    profile.name,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: AppTheme.sans,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
@@ -180,12 +183,12 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _Hero extends StatelessWidget {
+class _Hero extends ConsumerWidget {
   const _Hero({required this.onWork});
   final VoidCallback onWork;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _Page(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       child: LayoutBuilder(
@@ -213,20 +216,21 @@ class _Hero extends StatelessWidget {
   }
 }
 
-class _HeroCopy extends StatelessWidget {
+class _HeroCopy extends ConsumerWidget {
   const _HeroCopy({required this.onWork, required this.compact});
   final VoidCallback onWork;
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(profileProvider);
     final titleSize = compact ? 56.0 : 72.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '${Profile.location}  ·  OPEN TO FLUTTER ROLES',
-          style: TextStyle(
+        Text(
+          '${profile.location}  ·  OPEN TO FLUTTER ROLES',
+          style: const TextStyle(
             fontFamily: AppTheme.sans,
             color: AppColors.fog,
             fontSize: 11,
@@ -239,11 +243,11 @@ class _HeroCopy extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(
-                text: '${Profile.firstName}\n',
+                text: '${profile.firstName}\n',
                 style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: titleSize),
               ),
               TextSpan(
-                text: Profile.lastName,
+                text: profile.lastName,
                 style: Theme.of(context).textTheme.displayLarge?.copyWith(
                   fontSize: titleSize,
                   fontStyle: FontStyle.italic,
@@ -255,7 +259,7 @@ class _HeroCopy extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          '${Profile.title} shipping high-performance Android and iOS apps — from mill-floor production systems to consumer products with ${Profile.downloads} downloads.',
+          '${profile.title} shipping high-performance Android and iOS apps — from mill-floor production systems to consumer products with ${profile.downloads} downloads.',
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 20),
@@ -272,7 +276,7 @@ class _HeroCopy extends StatelessWidget {
               child: const Text('SELECTED WORK'),
             ),
             OutlinedButton(
-              onPressed: () => openMail(email: Profile.email, subject: 'Hello Nitin'),
+              onPressed: () => openMail(email: profile.email, subject: 'Hello Nitin'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.paper,
                 side: BorderSide(color: AppColors.paper.withValues(alpha: 0.18)),
@@ -280,7 +284,7 @@ class _HeroCopy extends StatelessWidget {
               child: const Text('WRITE TO ME'),
             ),
             OutlinedButton(
-              onPressed: () => openUrl(Profile.linkedin),
+              onPressed: () => openUrl(profile.linkedin),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.paper,
                 side: BorderSide(color: AppColors.paper.withValues(alpha: 0.18)),
@@ -294,11 +298,12 @@ class _HeroCopy extends StatelessWidget {
   }
 }
 
-class _HeroShot extends StatelessWidget {
+class _HeroShot extends ConsumerWidget {
   const _HeroShot();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(statsProvider);
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Stack(
@@ -363,11 +368,14 @@ class _HeroShot extends StatelessWidget {
   }
 }
 
-class _Work extends StatelessWidget {
+class _Work extends ConsumerWidget {
   const _Work();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final projects = ref.watch(projectsProvider);
+    final extraProjects = ref.watch(extraProjectsProvider);
+
     final featured = projects.firstWhere((p) => p.featured);
     final rest = projects.where((p) => !p.featured).toList();
 
@@ -438,9 +446,7 @@ class _ProjectCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => ProjectScreen(project: project)),
-          );
+          context.push('/project', extra: project);
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,11 +572,12 @@ class _ExtraTile extends StatelessWidget {
   }
 }
 
-class _Experience extends StatelessWidget {
+class _Experience extends ConsumerWidget {
   const _Experience();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final experience = ref.watch(experienceProvider);
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 36),
@@ -652,11 +659,12 @@ class _Experience extends StatelessWidget {
   }
 }
 
-class _Skills extends StatelessWidget {
+class _Skills extends ConsumerWidget {
   const _Skills();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final skillGroups = ref.watch(skillsProvider);
     return _Page(
       padding: const EdgeInsets.fromLTRB(24, 48, 24, 8),
       child: Column(
@@ -731,11 +739,13 @@ class _Skills extends StatelessWidget {
   }
 }
 
-class _About extends StatelessWidget {
+class _About extends ConsumerWidget {
   const _About();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(profileProvider);
+    final education = ref.watch(educationProvider);
     return _Page(
       padding: const EdgeInsets.fromLTRB(24, 40, 24, 8),
       child: Column(
@@ -752,12 +762,12 @@ class _About extends StatelessWidget {
                 kicker: null,
                 title: 'A lead who still ships.',
                 body:
-                    '${Profile.summary} Comfortable on both consumer Play Store products and internal tools that have to work every morning on a factory floor.',
+                    '${profile.summary} Comfortable on both consumer Play Store products and internal tools that have to work every morning on a factory floor.',
               );
-              const edu = _AboutCard(
+              final edu = _AboutCard(
                 kicker: 'EDUCATION',
-                title: Education.degree,
-                body: '${Education.focus}\n${Education.school}',
+                title: education.degree,
+                body: '${education.focus}\n${education.school}',
               );
               if (!two) {
                 return Column(
@@ -769,7 +779,7 @@ class _About extends StatelessWidget {
                 children: [
                   Expanded(child: bio),
                   const SizedBox(width: 12),
-                  const Expanded(child: edu),
+                  Expanded(child: edu),
                 ],
               );
             },
@@ -819,14 +829,14 @@ class _AboutCard extends StatelessWidget {
   }
 }
 
-class _Contact extends StatefulWidget {
+class _Contact extends ConsumerStatefulWidget {
   const _Contact();
 
   @override
-  State<_Contact> createState() => _ContactState();
+  ConsumerState<_Contact> createState() => _ContactState();
 }
 
-class _ContactState extends State<_Contact> {
+class _ContactState extends ConsumerState<_Contact> {
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _message = TextEditingController();
@@ -840,8 +850,9 @@ class _ContactState extends State<_Contact> {
   }
 
   Future<void> _send() async {
+    final profile = ref.read(profileProvider);
     await openMail(
-      email: Profile.email,
+      email: profile.email,
       subject:
           'Portfolio note from ${_name.text.trim().isEmpty ? 'the app' : _name.text.trim()}',
       body: '${_message.text.trim()}\n\n— ${_name.text.trim()} · ${_email.text.trim()}',
@@ -850,6 +861,7 @@ class _ContactState extends State<_Contact> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(profileProvider);
     const field = InputDecoration(
       filled: true,
       fillColor: AppColors.ink2,
@@ -898,18 +910,18 @@ class _ContactState extends State<_Contact> {
       children: [
         _LinkRow(
           icon: Icons.mail_outline,
-          label: Profile.email,
-          onTap: () => openMail(email: Profile.email),
+          label: profile.email,
+          onTap: () => openMail(email: profile.email),
         ),
         _LinkRow(
           icon: Icons.phone_outlined,
-          label: Profile.phone,
-          onTap: () => openUrl(Profile.phoneUri),
+          label: profile.phone,
+          onTap: () => openUrl(profile.phoneUri),
         ),
         _LinkRow(
           icon: Icons.link,
           label: 'linkedin.com/in/nitin-mistry',
-          onTap: () => openUrl(Profile.linkedin),
+          onTap: () => openUrl(profile.linkedin),
         ),
         _LinkRow(
           icon: Icons.language,
@@ -978,11 +990,12 @@ class _LinkRow extends StatelessWidget {
   }
 }
 
-class _Footer extends StatelessWidget {
+class _Footer extends ConsumerWidget {
   const _Footer();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(profileProvider);
     return _Page(
       padding: const EdgeInsets.fromLTRB(24, 28, 24, 40),
       child: Wrap(
@@ -991,7 +1004,7 @@ class _Footer extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
-            '© ${DateTime.now().year} ${Profile.name}  ·  ${Profile.location}',
+            '© ${DateTime.now().year} ${profile.name}  ·  ${profile.location}',
             style: const TextStyle(
               fontFamily: AppTheme.sans,
               color: AppColors.fog,
