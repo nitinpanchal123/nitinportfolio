@@ -88,7 +88,3 @@ flutter run
 ## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 📸 Screenshots
-| Desktop Home | Mobile Detail |
-| :--- | :--- |
-| ![Home Desktop](test/goldens/home_desktop.png) | ![Home Mobile](test/goldens/home_mobile.png) |
